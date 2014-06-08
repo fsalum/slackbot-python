@@ -1,0 +1,4 @@
+requests==2.3.0
+boto==2.28.0
+importlib==1.0.3
+python-daemon==1.6
