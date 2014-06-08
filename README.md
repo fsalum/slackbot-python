@@ -1,4 +1,4 @@
-# Slask
+# SlackBot
 A [Slack](https://slack.com/) bot running in *daemon mode* with *Amazon SQS* integration.
 
 Original version using *Flask* and *Outgoing WebHooks* integration by [llimllib/slask](https://github.com/llimllib/slask).
