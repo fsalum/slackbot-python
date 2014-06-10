@@ -1,5 +1,6 @@
 config = {
-    "token": '<amazon sqs token integration>',
+    "webhook_token": '<incoming webhook integration token>',
+    "sqs_token": '<amazon sqs integration token>',
     "aws_access_key": '<with sqs permissions>',
     "aws_secret_key": '<with sqs permissions>',
     "username": '<bot name>',

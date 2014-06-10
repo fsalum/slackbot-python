@@ -8,7 +8,6 @@ import os
 import re
 import time
 import json
-import logging
 import requests
 import importlib
 import traceback
@@ -28,7 +27,7 @@ aws_secret_key = config.get("aws_secret_key")
 region = 'us-east-1'
 hooks = {}
 
-conn = boto.sqs.connect_to_region(region,aws_access_key_id=aws_access_key,aws_secret_access_key=aws_secret_key)
+conn = boto.sqs.connect_to_region(region, aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
 
 q = conn.get_queue(queue_name)
 q.set_message_class(RawMessage)
@@ -89,58 +88,40 @@ def run_hook(hook, data, server):
 def get_msg():
     results = q.get_messages(num_messages=1, wait_time_seconds=1, visibility_timeout=30)
 
+    sqs_token = config.get("sqs_token")
+
     if not len(results) == 0:
         for result in results:
             body = json.loads(result.get_body())
             user = body['user_name']
             channel = "#" + body['channel_name']
+            msgtoken = body['token']
 
-            # ignore/delete message we sent
-            if user == "slackbot":
+            if msgtoken == sqs_token:
+                # ignore/delete message we sent
+                if user == "slackbot":
+                    q.delete_message(result)
+                    return ""
+
+                response = run_hook("message", body, {"config": config, "hooks": hooks})
                 q.delete_message(result)
-                return ""
+                if not response:
+                    return ""
 
-            response = run_hook("message", body, {"config": config, "hooks": hooks})
-            q.delete_message(result)
-            if not response:
-                return ""
-
-            send_msg(channel, response)
-            # Uncomment to debug on console
-            # print response
+                send_msg(channel, response)
+            else:
+                # msg with invalid token
+                q.delete_message(result)
 
 
 def send_msg(channel, response):
     username = config.get("username")
     icon_url = config.get("icon_url")
-    token = config.get("token")
+    webhook_token = config.get("webhook_token")
     domain = config.get("domain")
-    url = "https://" + domain + "/services/hooks/incoming-webhook?token=" + token
+    url = "https://" + domain + "/services/hooks/incoming-webhook?token=" + webhook_token
     payload = {'channel': channel, 'username': username, 'text': response, 'icon_url': icon_url}
     r = requests.post(url, data=json.dumps(payload), timeout=5)
-    print r.status_code
-
-
-def initialize_logging(logfile):
-    """ Log information based upon users options"""
-
-    logger = logging.getLogger(logfile)
-    formatter = logging.Formatter('%(asctime)s\t%(message)s')
-    level = logging.DEBUG
-    logger.setLevel(level)
-
-    # Output logging information to screen
-    #if 'now' in ACTION:
-    #    hdlr = logging.StreamHandler(sys.stderr)
-    #    hdlr.setFormatter(formatter)
-    #    logger.addHandler(hdlr)
-
-    # Output logging information to file
-    hdlr2 = logging.FileHandler(logfile)
-    hdlr2.setFormatter(formatter)
-    logger.addHandler(hdlr2)
-
-    return logger
 
 
 if __name__ == '__main__':
