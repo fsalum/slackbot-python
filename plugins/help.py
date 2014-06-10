@@ -3,7 +3,8 @@
 import re
 
 def on_message(msg, server):
-    match = re.findall(r"!help( .*)?", msg)
+    text = msg["text"]
+    match = re.findall(r"!help( .*)?", text)
     if not match: return
 
     helptopic = match[0].strip()

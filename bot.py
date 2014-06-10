@@ -92,16 +92,15 @@ def get_msg():
     if not len(results) == 0:
         for result in results:
             body = json.loads(result.get_body())
-            user = str(body['user_name'])
-            channel = "#" + str(body['channel_name'])
-            text = (body['text']).encode('utf-8')
+            user = body['user_name']
+            channel = "#" + body['channel_name']
 
             # ignore/delete message we sent
             if user == "slackbot":
                 q.delete_message(result)
                 return ""
 
-            response = run_hook("message", text, {"config": config, "hooks": hooks})
+            response = run_hook("message", body, {"config": config, "hooks": hooks})
             q.delete_message(result)
             if not response:
                 return ""

@@ -22,7 +22,8 @@ def gif(searchterm, unsafe=False):
     return gifs[0] if gifs else ""
 
 def on_message(msg, server):
-    match = re.findall(r"!gif (.*)", msg)
+    text = msg["text"]
+    match = re.findall(r"!gif (.*)", text)
     if not match: return
 
     searchterm = match[0]

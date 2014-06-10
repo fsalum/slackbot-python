@@ -7,7 +7,8 @@ def echo(message):
 
 
 def on_message(msg, server):
-    match = re.findall(r"!echo( .*)?", msg)
+    text = msg["text"]
+    match = re.findall(r"!echo( .*)?", text)
     if not match: return
 
     message = match[0]
