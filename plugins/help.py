@@ -3,7 +3,7 @@
 import re
 
 def on_message(msg, server):
-    text = msg["text"]
+    text = msg.get("text", "")
     match = re.findall(r"!help( .*)?", text)
     if not match: return
 

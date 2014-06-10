@@ -16,7 +16,7 @@ def stock(searchterm):
     return images[0] if images else ""
 
 def on_message(msg, server):
-    text = msg["text"]
+    text = msg.get("text", "")
     match = re.findall(r"!stock (.*)", text)
     if not match: return
 

@@ -35,7 +35,7 @@ def wiki(searchterm):
     return u"{}\n{}".format(p, link)
 
 def on_message(msg, server):
-    text = msg["text"]
+    text = msg.get("text", "")
     match = re.findall(r"!wiki (.*)", text)
     if not match: return
 
