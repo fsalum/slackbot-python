@@ -93,25 +93,22 @@ def get_msg():
     if not len(results) == 0:
         for result in results:
             body = json.loads(result.get_body())
-            user = body['user_name']
-            channel = "#" + body['channel_name']
-            msgtoken = body['token']
+            user = body.get("user_name", "")
+            channel = "#" + body.get("channel_name", "")
+            msgtoken = body.get("token", "")
 
-            if msgtoken == sqs_token:
-                # ignore/delete message we sent
-                if user == "slackbot":
-                    q.delete_message(result)
-                    return ""
-
-                response = run_hook("message", body, {"config": config, "hooks": hooks})
+            # ignore/delete message we sent
+            if user == "slackbot":
                 q.delete_message(result)
-                if not response:
-                    return ""
+                return ""
 
-                send_msg(channel, response)
-            else:
-                # msg with invalid token
-                q.delete_message(result)
+            response = run_hook("message", body, {"config": config, "hooks": hooks})
+            q.delete_message(result)
+
+            if not response:
+                return ""
+
+            send_msg(channel, response)
 
 
 def send_msg(channel, response):
