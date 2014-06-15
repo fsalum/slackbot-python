@@ -50,3 +50,9 @@ heroku logs
 Right now, `!help`, `!echo`, `!gif`, `!image`, `!youtube` and `!wiki` are the only available commands.
 
 It's super easy to add your own commands! Just create a python file in the plugins directory with an `on_message` function that returns a string.
+
+## Integrations
+
+Besides commands you can also integrate other types of plugins that just listen for a specific message in the SQS queue.
+
+See per example the [stackdriver-reader](https://github.com/fsalum/slackbot-python/blob/master/plugins/README.md) plugin that wait for Stackdriver to send policy alerts to a SNS topic which is subscribed by the SQS queue used by this daemon.
