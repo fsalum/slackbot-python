@@ -25,14 +25,14 @@ def stackdriver(text):
     return
 
 def send_msg(summary, color, incident_url, resource_id, resource_name, state):
-    username = config.get("username")
     webhook_token = config.get("webhook_token")
     domain = config.get("domain")
+    stackdriver_username = config.get("stackdriver_username")
     stackdriver_channel = config.get("stackdriver_channel")
     stackdriver_icon = config.get("stackdriver_icon")
     url = "https://" + domain + "/services/hooks/incoming-webhook?token=" + webhook_token
 
-    payload = {'channel': stackdriver_channel, 'username': username, 'icon_url': stackdriver_icon,
+    payload = {'channel': stackdriver_channel, 'username': stackdriver_username, 'icon_url': stackdriver_icon,
                'attachments': [{'fallback': 'stackdriver alerts', 'pretext': summary, "color": color,
                                 'fields': [{'title': 'Incident', 'value': incident_url, 'short': True},
                                            {'title': 'State', 'value': state, 'short': True},
