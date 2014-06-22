@@ -1,5 +1,6 @@
 """!jira - !help atlassian-jira
 !jira info <issue-id>
+!jira assign <issue-id> <username>
 !jira comment <issue-id> <comment>
 !jira create <project-key> <summary>
 !jira close <issue-id> <comment>
@@ -25,6 +26,8 @@ def atlassian_jira(user, action, parameter):
         return projects(jira, parameter)
     elif action == 'info':
         return info(jira, parameter)
+    elif action == 'assign':
+        return assign(jira, parameter)
     elif action == 'comment':
         comment(user, jira, parameter)
     elif action == 'create':
@@ -55,6 +58,13 @@ def info(jira, parameter):
                                        {'title': 'Assignee', 'value': assignee, 'short': True},
                                        {'title': 'Status', 'value': status, 'short': True}, ]}
     return message
+
+
+def assign(jira, parameter):
+    m = re.match(r"(\w+-\d+) (.*)", parameter)
+    jira_id = m.group(1)
+    jira_assign_user = m.group(2)
+    jira.assign_issue(jira_id, jira_assign_user)
 
 
 def comment(user, jira, parameter):
@@ -106,7 +116,7 @@ def on_message(msg, server):
     text = msg.get("text", "")
     user = msg.get("user_name", "")
     parameter = None
-    m = re.match(r"!jira (info|comment|create|close|projects) ?(.*)", text)
+    m = re.match(r"!jira (info|assign|comment|create|close|projects) ?(.*)", text)
     if not m:
         return
 
