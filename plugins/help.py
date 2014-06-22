@@ -9,6 +9,6 @@ def on_message(msg, server):
 
     helptopic = match[0].strip()
     if helptopic:
-        return server["hooks"]["help"].get(helptopic, "No help found for %s" % helptopic)
+        return server["hooks"]["extendedhelp"].get(helptopic, "No help found for %s" % helptopic)
     else:
         return "\n".join(val for _, val in server["hooks"]["help"].iteritems())

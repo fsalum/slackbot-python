@@ -117,8 +117,14 @@ def send_msg(channel, response):
     webhook_token = config.get("webhook_token")
     domain = config.get("domain")
     url = "https://" + domain + "/services/hooks/incoming-webhook?token=" + webhook_token
-    payload = {'channel': channel, 'username': username, 'text': response, 'icon_url': icon_url}
+
+    for item in response:
+        if 'fallback' in item:
+            payload = {'channel': channel, 'username': username, 'icon_url': icon_url, 'attachments': response}
+        else:
+            payload = {'channel': channel, 'username': username, 'text': response, 'icon_url': icon_url}
     r = requests.post(url, data=json.dumps(payload), timeout=5)
+    print r.status_code
 
 
 if __name__ == '__main__':
