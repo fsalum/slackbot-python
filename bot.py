@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Python example to send SQS messages
+# Slack.com Python bot using Amazon SNS/Incoming WebHook integration
 #
 
 import sys
