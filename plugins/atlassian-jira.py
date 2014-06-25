@@ -10,6 +10,7 @@
 import re
 from config import config
 from jira.client import JIRA
+from jira.exceptions import JIRAError
 
 
 def atlassian_jira(user, action, parameter):
@@ -29,11 +30,11 @@ def atlassian_jira(user, action, parameter):
     elif action == 'assign':
         return assign(jira, parameter)
     elif action == 'comment':
-        comment(user, jira, parameter)
+        return comment(user, jira, parameter)
     elif action == 'create':
-        create(user, jira, parameter)
+        return create(user, jira, parameter)
     elif action == 'close':
-        close(user, jira, parameter)
+        return close(user, jira, parameter)
 
 
 def info(jira, parameter):
@@ -73,7 +74,11 @@ def comment(user, jira, parameter):
     jira_comment = m.group(2)
     jira_comment =+ "\n Comment by %s" % user
 
-    jira.add_comment(jira_id, jira_comment)
+    try:
+        jira.add_comment(jira_id, jira_comment)
+    except JIRAError as e:
+        response = "%s: ERROR %s %s (!jira comment %s)" % (user, str(e.status_code), str(e.text), parameter)
+        return response
 
 
 def create(user, jira, parameter):
@@ -88,7 +93,12 @@ def create(user, jira, parameter):
         'issuetype': {'name': 'Bug'},
         'assignee': {'name': user},
     }
-    jira.create_issue(fields=issue_dict)
+
+    try:
+        jira.create_issue(fields=issue_dict)
+    except JIRAError as e:
+        response = "%s: ERROR %s %s (!jira create %s)" % (user, str(e.status_code), str(e.text), parameter)
+        return response
 
 
 def close(user, jira, parameter):
@@ -99,8 +109,11 @@ def close(user, jira, parameter):
     jira_comment += "\n Closed by user %s" % user
     issue = jira.issue(jira_key)
 
-    jira.transition_issue(issue, '5', comment=jira_comment)
-
+    try:
+        jira.transition_issue(issue, '5', comment=jira_comment)
+    except JIRAError as e:
+        response = "%s: ERROR %s %s (!jira close %s)" % (user, str(e.status_code), str(e.text), parameter)
+        return response
 
 def projects(jira, parameter):
     p = jira.projects()
