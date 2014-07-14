@@ -4,6 +4,7 @@ import requests
 import json
 from config import config
 
+
 def stackdriver(text):
     incident_id = text.get("incident_id", "")
     resource_id = text.get("resource_id", "")
@@ -24,6 +25,7 @@ def stackdriver(text):
     send_msg(summary, color, incident_url, resource_id, resource_name, state)
     return
 
+
 def send_msg(summary, color, incident_url, resource_id, resource_name, state):
     webhook_token = config.get("webhook_token")
     domain = config.get("domain")
@@ -42,8 +44,20 @@ def send_msg(summary, color, incident_url, resource_id, resource_name, state):
     r = requests.post(url, data=json.dumps(payload), timeout=5)
     print r.status_code
 
+
 def on_message(msg, server):
-    text = msg.get("incident", "")
+    topic_arn = msg.get("TopicArn", "")
+
+    if topic_arn:
+        stackdriver_sns_topic = config.get("stackdriver_sns_topic")
+        if stackdriver_sns_topic in topic_arn:
+            incident_dict = json.loads(msg.get("Message", ""))
+            text = incident_dict.get("incident", "")
+        else:
+            return
+    else:
+        return
+
     if not text:
         return
 

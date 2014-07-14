@@ -12,6 +12,7 @@ config = {
     "stackdriver_username": 'stackdriver',
     "stackdriver_channel": '#monitoring',
     "stackdriver_icon": 'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xaf1/t1.0-1/p160x160/417293_271031206332030_738543521_n.jpg',
+    "stackdriver_sns_topic": 'arn:aws:sns:us-east-1:<aws account id>:<sns topic name>',
 
     # jira plugin
     "jira_username": '<jira username>',
